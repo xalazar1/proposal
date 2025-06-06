@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Proposal</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;600&display=swap');
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Montserrat', sans-serif;
+      background: #fff7f9;
+      color: #4a4a4a;
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      user-select: none;
+      overflow-x: hidden;
+      flex-direction: column;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    .page {
+      display: none;
+      max-width: 440px;
+      width: 100%;
+      padding: 36px 28px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(218, 138, 158, 0.2);
+      text-align: center;
+      flex-direction: column;
+      gap: 1.1rem;
+      position: relative;
+      z-index: 1;
+      transition: opacity 0.3s ease;
+    }
+
+    .page.active {
+      display: flex;
+      opacity: 1;
+    }
+
+    h1, h2, h3, h4 {
+      font-family: 'Great Vibes', cursive;
+      margin: 0;
+      color: #d8697a;
+      letter-spacing: 0.04em;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+    }
+
+    h2 {
+      font-size: 1.9rem;
+      font-weight: 400;
+    }
+
+    h3 {
+      font-size: 1.3rem;
+      margin-top: 12px;
+      color: #c75a6c;
+    }
+
+    h4 {
+      font-size: 1.15rem;
+      margin-top: 8px;
+      color: #b94c5a;
+      font-weight: 400;
+    }
+
+    p {
+      margin: 0;
+      font-size: 1rem;
+      line-height: 1.5;
+      color: #666;
+      font-weight: 400;
+    }
+
+    p.italic-bold {
+      font-weight: 600;
+      font-style: italic;
+      margin-top: 12px;
+      color: #a45c6a;
+    }
+
+    button {
+      cursor: pointer;
+      border-radius: 12px;
+      border: none;
+      padding: 14px 30px;
+      font-weight: 600;
+      font-size: 1.1rem;
+      background: #e18795;
+      color: white;
+      transition: background-color 0.25s ease;
+      user-select: none;
+      box-shadow: 0 4px 10px rgba(225, 140, 156, 0.5);
+    }
+
+    button:hover {
+      background: #b95967;
+      box-shadow: 0 6px 15px rgba(185, 89, 103, 0.7);
+    }
+
+    #buttonContainer {
+      display: flex;
+      justify-content: center;
+      gap: 18px;
+      margin-top: 1rem;
+      flex-wrap: wrap;
+    }
+
+    #noBtn {
+      background: transparent;
+      border: 2px solid #e18795;
+      color: #e18795;
+      box-shadow: none;
+      transition: background-color 0.25s ease, color 0.25s ease;
+    }
+
+    #noBtn:hover {
+      background: #e18795;
+      color: white;
+      box-shadow: 0 4px 12px rgba(225, 135, 149, 0.6);
+    }
+
+    input[type="text"] {
+      font-family: 'Montserrat', sans-serif;
+      font-size: 1rem;
+      width: 100%;
+      padding: 10px 14px;
+      border: 2px solid #e18795;
+      border-radius: 12px;
+      outline-offset: 2px;
+      margin-top: 1rem;
+      transition: border-color 0.3s ease;
+    }
+
+    input[type="text"]:focus {
+      border-color: #b95967;
+      box-shadow: 0 0 6px rgba(185, 89, 103, 0.5);
+    }
+
+    #errorMessage {
+      margin-top: 10px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      color: #c94a48;
+      display: none;
+    }
+
+    img {
+      border-radius: 12px;
+      margin-top: 15px;
+      max-width: 160px;
+      user-select: none;
+      display: block;
+      margin-left: auto;
+      margin-right: auto;
+      box-shadow: 0 5px 15px rgba(220, 106, 90, 0.3);
+    }
+
+    #cryingCaption {
+      color: #e18795;
+      font-weight: 600;
+      margin-top: 8px;
+      display: none;
+    }
+
+    canvas#confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      z-index: 9999;
+      display: none;
+    }
+
+    /* Audio player container */
+    .audio-container {
+      max-width: 440px;
+      width: 100%;
+      margin: 20px auto 30px;
+      text-align: center;
+    }
+
+    /* Broken heart rain effect */
+    #noErrorParticles {
+      position: fixed;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+      z-index: 999;
+      overflow: hidden;
+    }
+
+    .error-particle {
+      position: absolute;
+      animation: fallHeart 2.5s linear forwards;
+      opacity: 0.85;
+      user-select: none;
+      font-size: 24px;
+      color: #e18795;
+      pointer-events: none;
+      user-select: none;
+      font-weight: 700;
+      text-shadow: 0 0 3px rgba(255, 255, 255, 0.7);
+    }
+
+    @keyframes fallHeart {
+      0% {
+        transform: translateY(-20px) scale(1) rotate(0deg);
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(100vh) scale(1.2) rotate(360deg);
+        opacity: 0;
+      }
+    }
+
+    /* Scroll styling for page 4 */
+    #page4 {
+      padding: 20px 18px;
+      border: 2px solid #e18795;
+      border-radius: 16px;
+      background: #fff0f3;
+      max-width: 420px;
+      max-height: 80vh;
+      margin: auto;
+      font-family: 'Montserrat', sans-serif;
+      text-align: center;
+      overflow-y: auto;
+      box-sizing: border-box;
+      position: relative;
+      color: #7a4952;
+      box-shadow: 0 6px 15px rgba(225, 135, 149, 0.3);
+    }
+
+    #page4 h2 {
+      color: #c75a6c;
+      font-weight: 400;
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+    }
+
+    #page4 p, #page4 ul {
+      font-size: 0.9rem;
+      line-height: 1.4;
+      margin: 6px 0;
+    }
+
+    #page4 ul {
+      list-style: none;
+      padding: 0;
+      line-height: 1.5;
+      color: #a65b68;
+    }
+
+    #page4 ul li {
+      margin: 4px 0;
+      position: relative;
+      padding-left: 22px;
+    }
+
+    #page4 ul li::before {
+      content: "✔️";
+      position: absolute;
+      left: 0;
+      top: 0;
+      font-size: 1.1rem;
+      color: #d8697a;
+    }
+
+    #page4 input[type="text"] {
+      border-color: #c75a6c;
+      margin-top: 8px;
+      font-size: 1rem;
+    }
+
+    #page4 button {
+      margin-top: 12px;
+      background: #c75a6c;
+      box-shadow: 0 4px 10px rgba(199, 90, 108, 0.5);
+    }
+
+    #page4 button:hover {
+      background: #a14a57;
+      box-shadow: 0 6px 15px rgba(161, 74, 87, 0.7);
+    }
+
+    /* Footer text on page 4 */
+    #page4 p.footer {
+      font-style: italic;
+      font-size: 0.8rem;
+      margin-top: 12px;
+      color: #b87081;
+    }
+
+    /* Page with response and gif */
+    #pageResponse {
+      max-width: 440px;
+      width: 100%;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(218, 138, 158, 0.2);
+      padding: 36px 28px;
+      text-align: center;
+      font-family: 'Montserrat', sans-serif;
+      color: #7a4952;
+    }
+
+    #responseText {
+      white-space: pre-wrap;
+      font-size: 1rem;
+      margin-bottom: 20px;
+      color: #a65b68;
+      font-weight: 500;
+      line-height: 1.5;
+    }
+
+    #responseGif {
+      max-width: 200px;
+      border-radius: 12px;
+      box-shadow: 0 6px 15px rgba(218, 138, 158, 0.3);
+      user-select: none;
+      margin: 0 auto;
+      display: block;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- page 1 -->
+  <div class="page active" id="page1">
+    <h1>Christine</h1>
+    <p>This website is just for you.<br>Ready to take the next step?</p>
+    <button onclick="goToPage(2)">Let's Go</button>
+  </div>
+
+  <!-- page 2 -->
+  <div class="page" id="page2">
+    <h1>From My Heart</h1>
+    <p>
+      Even when we're apart, your love is the home my heart returns to. You've made every day brighter, every smile deeper, and every hope stronger.
+    </p>
+    <p>
+      I don’t need a perfect life — just one with you in it.
+    </p>
+    <p class="italic-bold">Can I ask you something?</p>
+    <button onclick="goToPage(3)">Next</button>
+  </div>
+
+  <!-- page 3 -->
+  <div class="page" id="page3">
+    <h1>Will You Be My Girlfriend?</h1>
+    <p id="proposalText">This is the start of our forever.<br>No breakups, only love and laughter.</p>
+    <div id="buttonContainer">
+      <button id="yesBtn" onclick="sayYes()">Yes</button>
+      <button id="noBtn" onclick="handleNo()">No</button>
+    </div>
+  </div>
+
+  <!-- page 4: Agreement -->
+  <div class="page" id="page4">
+    <h2>The Unbreakable Bond Agreement</h2>
+    <p>Issued by: <strong>The Republic of Walang Katapusang Landian</strong></p>
+
+    <p>This is to <strong>officially declare</strong> that:</p>
+
+    <h3>Christine Lura Palinar</h3>
+
+    <p>has courageously and voluntarily agreed to be the:</p>
+    <h4>Wife of Gab</h4>
+
+    <p>With all the rights, privileges, and sacred duties of being:</p>
+    <ul>
+      <li>Emotional Support Human</li>
+      <li>Lifetime Hug Receiver &amp; Kilig Generator</li>
+      <li>Unlimited Kiss Provider (no expiry!)</li>
+      <li>Kalma Coach During Panic Moments</li>
+      <li>Keeper of Secrets</li>
+      <li>Personal Cheerleader</li>
+      <li>Protector of Heart and Happiness</li>
+      <li>Forever Choice, No Backspace</li>
+      <li>Forever Partner in Kakulitan &amp; Drama</li>
+    </ul>
+
+    <p>Effective immediately and valid for all lifetimes to come.</p>
+    <p class="footer">(No expiration, no returns, no escape.)</p>
+
+    <div style="text-align: left; margin-bottom: 12px;">
+      <label for="signature" style="display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 6px; color:#b94c5a;">Sign here with your full name to accept ✍️</label>
+      <input type="text" id="signature" placeholder="Type your full name here..." />
+      <p id="errorMessage">Oops! Please type your full name correctly.</p>
+      <button onclick="submitSignature()">Accept & Confirm</button>
+    </div>
+
+    <div style="margin-top: 8px; text-align: center;">
+      <img src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif" alt="Heart stamp" style="width: 50px; transform: rotate(-10deg); margin-bottom: 6px;" />
+      <p style="color:#c75a6c; font-style: italic; font-size: 0.9rem;">Officially sealed with love 💖</p>
+    </div>
+
+    <p style="margin-top: 12px; font-size: 0.9rem; font-weight: 600; color:#a45c6a;">Signed date: <span id="christineSignedDate">-</span></p>
+  </div>
+
+  <!-- page 5: Final with response and GIF -->
+  <div class="page" id="page5">
+    <h1>Welcome, Wife! 💖</h1>
+    <p>Thanks for saying yes — you just made the best decision of your life! No take-backs now, okay?</p>
+
+    <!-- The response text inserted by JS -->
+    <pre id="responseText"></pre>
+
+    <img
+      id="responseGif"
+      src="https://media1.tenor.com/m/gfvqqHmak90AAAAd/bear.gif"
+      alt="Happy couple animation"
+    />
+  </div>
+
+  <canvas id="confettiCanvas"></canvas>
+
+  <script>
+    // The response text to show on page 5
+    const response = `
+    From this moment on, you're not just my girlfriend — you're my person, my constant, my home no matter the distance. I promise to show up for you, through every call, every message, and every moment in between. Even if the Wi-Fi’s down or life gets a little laggy, my love for you will never disconnect. 					We’ve got this — together, always.
+
+
+
+ Yours always,
+    Gab
+    `.trim();
+
+    // Insert response text into the page5 pre element
+    document.getElementById('responseText').textContent = response;
+
+    const pages = document.querySelectorAll('.page');
+    const confettiCanvas = document.getElementById('confettiCanvas');
+    let confettiCtx, confettiParticles = [];
+    let confettiAnimationId;
+
+    function goToPage(n) {
+      pages.forEach(p => p.classList.remove('active'));
+      const page = document.getElementById('page' + n);
+      page.classList.add('active');
+    }
+
+   let noTries = 0;
+
+const noMessages = [
+  "BAKIT KA NAG NO?",
+  "INULIT PA TALAGA!",
+  "INIINIS MO BA TALAGA AKO?.",
+  "MAG YES KA NA TANGA!",
+  "SAY YES BABE!"
+];
+
+const noGifs = [
+  'https://media.tenor.com/RwAaE57CfHYAAAAj/khaupb.gif', // sad cat
+  'https://media.tenor.com/pgup5QswF30AAAAj/twitter-bubu-push.gif', // puppy eyes
+  'https://media1.tenor.com/m/zkvh5c3BkKoAAAAd/cute-adorable.gif', // crying cartoon
+  'https://media.tenor.com/-Oes-vO2J-sAAAAj/milk-and-mocha.gif', // sad panda
+  'https://media.tenor.com/KGnViErYaD8AAAAj/abraçourso.gif'  // broken heart animation
+];
+
+function handleNo() {
+  noTries++;
+
+  // Broken heart rain effect (every click)
+  if (!document.getElementById('noErrorParticles')) {
+    const container = document.createElement('div');
+    container.id = 'noErrorParticles';
+    document.body.appendChild(container);
+
+    for (let i = 0; i < 20; i++) {
+      const heart = document.createElement('div');
+      heart.textContent = '💔';
+      heart.className = 'error-particle';
+      heart.style.left = Math.random() * window.innerWidth + 'px';
+      heart.style.top = -30 - Math.random() * 100 + 'px';
+      heart.style.animationDelay = (i * 0.1) + 's';
+      container.appendChild(heart);
+    }
+
+    setTimeout(() => {
+      container.remove();
+    }, 3000);
+  }
+
+  if (noTries <= 5) {
+    const container = document.getElementById('buttonContainer');
+
+    // Remove previous message+gif if exist
+    const oldMsg = document.getElementById('noResponseMessage');
+    const oldGif = document.getElementById('noResponseGif');
+    if (oldMsg) oldMsg.remove();
+    if (oldGif) oldGif.remove();
+
+    // Create new message
+    const message = document.createElement('p');
+    message.id = 'noResponseMessage';
+    message.textContent = noMessages[noTries - 1];
+    message.style.color = "#c94a48";
+    message.style.fontWeight = "600";
+    message.style.marginTop = "12px";
+    message.style.fontSize = "1rem";
+    message.style.textAlign = "center";
+
+    // Create new gif
+    const gif = document.createElement('img');
+    gif.id = 'noResponseGif';
+    gif.src = noGifs[noTries - 1];
+    gif.alt = 'Sad reaction gif';
+    gif.style.width = '160px';
+    gif.style.borderRadius = '12px';
+    gif.style.marginTop = '10px';
+    gif.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+    gif.style.display = 'block';
+    gif.style.marginLeft = 'auto';
+    gif.style.marginRight = 'auto';
+
+    // Insert message and gif below button container (stacked)
+    container.after(gif);
+    gif.before(message);
+  }
+}
+
+
+    // Yes button: go to agreement page (page 4)
+    function sayYes() {
+      goToPage(4);
+    }
+
+    function submitSignature() {
+      const input = document.getElementById('signature');
+      const errorMsg = document.getElementById('errorMessage');
+      const signedDate = document.getElementById('christineSignedDate');
+      const name = input.value.trim();
+
+      if (name.length < 3) {
+        errorMsg.style.display = 'block';
+        return;
+      }
+
+      errorMsg.style.display = 'none';
+      signedDate.textContent = new Date().toLocaleDateString();
+      goToPage(5);
+      startConfetti();
+    }
+
+    // Confetti effect on acceptance
+    function startConfetti() {
+      confettiCanvas.style.display = 'block';
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+      confettiCtx = confettiCanvas.getContext('2d');
+
+      confettiParticles = [];
+      for(let i = 0; i < 150; i++) {
+        confettiParticles.push({
+          x: Math.random() * confettiCanvas.width,
+          y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+          r: Math.random() * 6 + 4,
+          d: Math.random() * 20 + 10,
+          color: `hsl(${Math.random() * 20 + 330}, 80%, 70%)`,
+          tilt: Math.floor(Math.random() * 10) - 10,
+          tiltAngle: 0,
+          tiltAngleIncrement: 0.05 + Math.random() / 10
+        });
+      }
+      confettiAnimationId = requestAnimationFrame(drawConfetti);
+    }
+
+    function drawConfetti() {
+      confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+      confettiParticles.forEach(p => {
+        confettiCtx.beginPath();
+        confettiCtx.lineWidth = p.r / 2;
+        confettiCtx.strokeStyle = p.color;
+        confettiCtx.moveTo(p.x + p.tilt + p.r / 2, p.y);
+        confettiCtx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r / 2);
+        confettiCtx.stroke();
+
+        p.tiltAngle += p.tiltAngleIncrement;
+        p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+        p.x += Math.sin(p.d);
+        p.tilt = Math.sin(p.tiltAngle) * 12;
+
+        if (p.y > confettiCanvas.height) {
+          p.x = Math.random() * confettiCanvas.width;
+          p.y = -20;
+        }
+      });
+      confettiAnimationId = requestAnimationFrame(drawConfetti);
+    }
+
+    window.addEventListener('resize', () => {
+      confettiCanvas.width = window.innerWidth;
+      confettiCanvas.height = window.innerHeight;
+    });
+  </script>
+
+</body>
+<!-- Music Player under the box -->
+  <div class="audio-container">
+    <audio controls autoplay loop>
+      <source src="https://hipstrumentals.com/wp-content/uploads/2024/05/Taylor-Swift-Love-Story-Instrumental-Prod.-By-Taylor-Swift-Nathan-Chapman.mp3" type="audio/mpeg" />
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+
+</html>
+
+
